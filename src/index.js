@@ -1,42 +1,33 @@
 import "dotenv/config";
-import uWS from "uWebSockets.js";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
 
 import * as categoriesController from "./controllers/categories.js";
 import * as productsController from "./controllers/products.js";
 import { getCorsOrigin, sendJson, sendOptions } from "./helpers/response.js";
 import { loadCategories } from "./models/categories.js";
 
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT || 3001);
 
 loadCategories();
 
-uWS
-	.App()
-	.options("/*", (res, req) => {
-		const corsOrigin = getCorsOrigin(req);
+const app = new Hono();
 
-		res.cork(() => {
-			sendOptions(res, corsOrigin);
-		});
-	})
-	// .get("/", (res) => {
-	// 	res.end("Hello");
-	// })
-	.get("/v1/categories", categoriesController.getCategories)
-	.post("/v1/categories/reload", categoriesController.reloadCategories)
-	.get("/v1/products", productsController.getProducts)
-	.get("/v1/products/:id", productsController.getProduct)
-	.any("/*", (res, req) => {
-		const corsOrigin = getCorsOrigin(req);
+app.options("/*", (c) => {
+	const corsOrigin = getCorsOrigin(c.req);
+	return sendOptions(corsOrigin);
+});
 
-		res.cork(() => {
-			sendJson(res, corsOrigin, { error: "Not Found" }, "404 Not Found");
-		});
-	})
-	.listen("0.0.0.0", PORT, (token) => {
-		if (token) {
-			console.log(`Listening on port ${PORT}`);
-		} else {
-			console.log("Failed to listen");
-		}
-	});
+app.get("/v1/categories", categoriesController.getCategories);
+app.post("/v1/categories/reload", categoriesController.reloadCategories);
+app.get("/v1/products", productsController.getProducts);
+app.get("/v1/products/:id", productsController.getProductById);
+app.all("/*", (c) => {
+	const corsOrigin = getCorsOrigin(c.req);
+	return sendJson({ error: "Not Found" }, corsOrigin, 404);
+});
+
+serve({ fetch: app.fetch.bind(app), port: PORT }, (info) => {
+	const port = typeof info === "number" ? info : info?.port || PORT;
+	console.log(`Listening on port ${port}`);
+});

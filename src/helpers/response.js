@@ -12,7 +12,10 @@ const corsOrigins =
 	allowedOrigins.length > 0 ? allowedOrigins : DEFAULT_ALLOWED_ORIGINS;
 
 function getRequestOrigin(req) {
-	return req?.getHeader("origin") || "";
+	// Expect a Fetch API Request (`c.req`) or similar with `headers.get()`.
+	if (!req || !req.headers || typeof req.headers.get !== "function") return "";
+
+	return req.headers.get("origin") || "";
 }
 
 export function getCorsOrigin(req) {
@@ -33,29 +36,33 @@ export function getCorsOrigin(req) {
 	return "";
 }
 
-export function writeCorsHeaders(res, corsOrigin) {
+function buildHeaders(corsOrigin) {
+	const headers = {
+		"Content-Type": "application/json",
+	};
+
 	if (corsOrigin) {
-		res.writeHeader("Access-Control-Allow-Origin", corsOrigin);
-		res.writeHeader("Vary", "Origin");
+		headers["Access-Control-Allow-Origin"] = corsOrigin;
+		headers["Vary"] = "Origin";
 	}
+
+	return headers;
 }
 
-export function sendJson(res, corsOrigin, data, status = "200 OK") {
-	res.writeStatus(status);
-	writeCorsHeaders(res, corsOrigin);
-	res.writeHeader("Content-Type", "application/json");
-	res.end(JSON.stringify(data));
+export function sendJson(data, corsOrigin, status = 200) {
+	return new Response(JSON.stringify(data), {
+		status,
+		headers: buildHeaders(corsOrigin),
+	});
 }
 
-export function sendOptions(res, corsOrigin) {
-	writeCorsHeaders(res, corsOrigin);
-	res.writeHeader(
-		"Access-Control-Allow-Methods",
-		"GET, POST, PUT, PATCH, DELETE, OPTIONS",
-	);
-	res.writeHeader(
-		"Access-Control-Allow-Headers",
-		"Content-Type, Authorization",
-	);
-	res.end();
+export function sendOptions(corsOrigin) {
+	return new Response(null, {
+		status: 204,
+		headers: {
+			...buildHeaders(corsOrigin),
+			"Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+			"Access-Control-Allow-Headers": "Content-Type, Authorization",
+		},
+	});
 }

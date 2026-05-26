@@ -1,28 +1,29 @@
 {
-  "name": "blue.api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
-    "pm2:start": "pm2 start ecosystem.config.cjs",
-    "pm2:restart": "pm2 restart blue-api",
-    "pm2:stop": "pm2 stop blue-api",
-    "pm2:logs": "pm2 logs blue-api",
-    "seed:categories": "node scripts/seed-categories.js",
-    "check": "biome check --write ./src ./scripts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "dependencies": {
-    "dotenv": "^17.4.2",
-    "redis": "^5.12.1",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.66.0"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.15"
-  }
+	"name": "blue.api",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "node --watch src/index.js",
+		"start": "node src/index.js",
+		"pm2:start": "pm2 start ecosystem.config.cjs",
+		"pm2:restart": "pm2 restart blue-api",
+		"pm2:stop": "pm2 stop blue-api",
+		"pm2:logs": "pm2 logs blue-api",
+		"seed:categories": "node scripts/seed-categories.js",
+		"check": "biome check --write ./src ./scripts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"dependencies": {
+		"@hono/node-server": "^2.0.4",
+		"dotenv": "^17.4.2",
+		"hono": "^4.9.0",
+		"redis": "^5.12.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.15"
+	}
 }
