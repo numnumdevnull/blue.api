@@ -1,0 +1,23 @@
+{
+  "name": "blue.api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "seed:categories": "node scripts/seed-categories.js",
+    "check": "biome check --write ./src ./scripts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "redis": "^5.12.1",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.66.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15"
+  }
+}
